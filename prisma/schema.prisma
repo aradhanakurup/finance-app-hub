@@ -1,0 +1,273 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Lender Management
+model Lender {
+  id                      String   @id @default(cuid())
+  name                    String   @unique
+  logo                    String?
+  apiEndpoint            String
+  apiKey                 String
+  isActive               Boolean  @default(true)
+  approvalRate           Float    @default(0.0)
+  avgResponseTime        Int      @default(0) // in minutes
+  minCreditScore         Int      @default(0)
+  maxLoanAmount          Float    @default(0)
+  minLoanAmount          Float    @default(0)
+  processingFee          Float    @default(0)
+  commissionRate         Float    @default(0) // percentage
+  supportedVehicleTypes  String[] // JSON array
+  supportedEmploymentTypes String[] // JSON array
+  webhookUrl             String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // Relations
+  applications           LenderApplication[]
+  analytics              LenderAnalytics[]
+
+  @@map("lenders")
+}
+
+// Customer Information
+model Customer {
+  id                    String   @id @default(cuid())
+  applicationId         String   @unique
+  firstName             String
+  lastName              String
+  email                 String
+  phone                 String
+  aadhaar               String   @unique
+  pan                   String   @unique
+  dateOfBirth           DateTime
+  addressStreet         String
+  addressCity           String
+  addressState          String
+  addressPincode        String
+  employmentType        String
+  companyName           String
+  designation           String
+  monthlyIncome         Float
+  experience            Int // in years
+  creditScore           Int
+  existingEmis          Float
+  bankName              String
+  accountNumber         String
+  ifscCode              String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("customers")
+}
+
+// Vehicle Information
+model Vehicle {
+  id                    String   @id @default(cuid())
+  applicationId         String   @unique
+  make                  String
+  model                 String
+  year                  Int
+  variant               String
+  price                 Float
+  downPayment           Float
+  loanAmount            Float
+  tenure                Int // in months
+  dealerName            String
+  dealerId              String
+  dealerLocation        String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("vehicles")
+}
+
+// Document Management
+model Document {
+  id                    String   @id @default(cuid())
+  applicationId         String
+  type                  String // identity_proof, income_proof, address_proof, employment_proof
+  fileName              String
+  fileUrl               String
+  verified              Boolean  @default(false)
+  uploadedAt            DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+// Main Application
+model Application {
+  id                    String   @id @default(cuid())
+  dealerId              String?
+  status                String   @default("DRAFT") // DRAFT, SUBMITTED, COMPLETED, CANCELLED
+  priority              String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  submittedAt           DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  dealer                Dealer? @relation(fields: [dealerId], references: [id])
+  customer              Customer?
+  vehicle               Vehicle?
+  documents             Document[]
+  lenderApplications    LenderApplication[]
+
+  @@map("applications")
+}
+
+// Lender Applications (Many-to-Many relationship)
+model LenderApplication {
+  id                    String   @id @default(cuid())
+  applicationId         String
+  lenderId              String
+  status                String   @default("PENDING") // PENDING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, etc.
+  submittedAt           DateTime @default(now())
+  respondedAt           DateTime?
+  responseTime          Int? // in minutes
+  interestRate          Float?
+  approvedAmount        Float?
+  loanTenure            Int?
+  processingFee         Float?
+  emiAmount             Float?
+  rejectionReason       String?
+  additionalDocuments   String[] // JSON array
+  conditions            String[] // JSON array
+  counterOfferAmount    Float?
+  counterOfferTenure    Int?
+  counterOfferRate      Float?
+  webhookData           Json? // Store webhook response
+  retryCount            Int      @default(0)
+  lastRetryAt           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  lender                Lender @relation(fields: [lenderId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, lenderId])
+  @@map("lender_applications")
+}
+
+// Analytics and Performance Tracking
+model LenderAnalytics {
+  id                    String   @id @default(cuid())
+  lenderId              String
+  date                  DateTime @default(now())
+  totalApplications     Int      @default(0)
+  approvedApplications  Int      @default(0)
+  rejectedApplications  Int      @default(0)
+  pendingApplications   Int      @default(0)
+  approvalRate          Float    @default(0.0)
+  avgResponseTime       Float    @default(0.0)
+  avgInterestRate       Float    @default(0.0)
+  totalCommission       Float    @default(0.0)
+  totalRevenue          Float    @default(0.0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  lender                Lender @relation(fields: [lenderId], references: [id], onDelete: Cascade)
+
+  @@unique([lenderId, date])
+  @@map("lender_analytics")
+}
+
+// System Configuration
+model SystemConfig {
+  id                    String   @id @default(cuid())
+  key                   String   @unique
+  value                 String
+  description           String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+// Dealer Management
+model Dealer {
+  id                    String   @id @default(cuid())
+  businessName          String
+  gstNumber             String   @unique
+  panNumber             String   @unique
+  contactPerson         String
+  email                 String   @unique
+  phone                 String
+  addressStreet         String
+  addressCity           String
+  addressState          String
+  addressPincode        String
+  businessType          String // INDIVIDUAL, PARTNERSHIP, COMPANY
+  registrationDate      DateTime
+  dealershipType        String[] // CAR, BIKE, COMMERCIAL, MULTI_BRAND
+  brands                String[] // JSON array of supported brands
+  status                String   @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+  approvedBy            String?
+  approvedAt            DateTime?
+  rejectionReason       String?
+  documents             DealerDocument[]
+  applications          Application[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("dealers")
+}
+
+// Dealer Documents
+model DealerDocument {
+  id                    String   @id @default(cuid())
+  dealerId              String
+  type                  String // GST_CERTIFICATE, PAN_CARD, SHOP_ACT_LICENSE, etc.
+  fileName              String
+  fileUrl               String
+  verified              Boolean  @default(false)
+  uploadedAt            DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  dealer                Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  @@map("dealer_documents")
+}
+
+// Audit Trail
+model AuditLog {
+  id                    String   @id @default(cuid())
+  action                String
+  entityType            String
+  entityId              String
+  userId                String?
+  oldValues             Json?
+  newValues             Json?
+  ipAddress             String?
+  userAgent             String?
+  createdAt             DateTime @default(now())
+
+  @@map("audit_logs")
+}
