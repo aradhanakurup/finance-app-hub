@@ -137,6 +137,24 @@ const APPROVAL_SCENARIOS = [
   },
 ];
 
+// Define a type for approval scenario
+export type Scenario = {
+  probability: number;
+  status: ApplicationStatus;
+  interestRateRange?: { min: number; max: number };
+  approvalAmountRange?: { min: number; max: number };
+  conditions?: string[];
+  rejectionReasons?: string[];
+};
+
+// Define a type for the return value of the function
+export type MockLenderResponse = {
+  lenderId: string;
+  status: string;
+  message?: string;
+  timestamp: Date;
+};
+
 // Utility Functions
 function getRandomNumber(min: number, max: number): number {
   return Math.random() * (max - min) + min;
@@ -146,9 +164,7 @@ function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function getRandomBoolean(probability: number): boolean {
-  return Math.random() < probability;
-}
+// Removed unused function
 
 function calculateEMI(principal: number, rate: number, tenure: number): number {
   const monthlyRate = rate / 12 / 100;
@@ -190,7 +206,7 @@ export class MockLenderService {
         applicationId,
         lenderId,
         status: 'REJECTED',
-        message: validationResult.reason,
+        message: validationResult.reason || 'Application rejected due to validation failure',
         timestamp: new Date(),
       };
     }
@@ -253,28 +269,28 @@ export class MockLenderService {
     customerData: CustomerData,
     vehicleData: VehicleData,
     financialData: FinancialData
-  ): any {
+  ): Scenario {
     // Calculate approval probability based on customer profile
-    let baseProbability = 0.6;
+    let probability = 0.6;
     
     // Credit score impact
-    if (customerData.financialInfo.creditScore >= 750) baseProbability += 0.2;
-    else if (customerData.financialInfo.creditScore >= 700) baseProbability += 0.1;
-    else if (customerData.financialInfo.creditScore < 650) baseProbability -= 0.2;
+    if (customerData.financialInfo.creditScore >= 750) probability += 0.2;
+    else if (customerData.financialInfo.creditScore >= 700) probability += 0.1;
+    else if (customerData.financialInfo.creditScore < 650) probability -= 0.2;
 
     // Income impact
     const debtToIncomeRatio = (customerData.financialInfo.existingEmis + financialData.requestedAmount * 0.02) / customerData.employmentInfo.monthlyIncome;
-    if (debtToIncomeRatio < 0.3) baseProbability += 0.15;
-    else if (debtToIncomeRatio > 0.6) baseProbability -= 0.25;
+    if (debtToIncomeRatio < 0.3) probability += 0.15;
+    else if (debtToIncomeRatio > 0.6) probability -= 0.25;
 
     // Employment stability
-    if (customerData.employmentInfo.experience >= 5) baseProbability += 0.1;
-    else if (customerData.employmentInfo.experience < 2) baseProbability -= 0.15;
+    if (customerData.employmentInfo.experience >= 5) probability += 0.1;
+    else if (customerData.employmentInfo.experience < 2) probability -= 0.15;
 
     // Vehicle age impact
     const vehicleAge = new Date().getFullYear() - vehicleData.year;
-    if (vehicleAge <= 3) baseProbability += 0.1;
-    else if (vehicleAge > 8) baseProbability -= 0.2;
+    if (vehicleAge <= 3) probability += 0.1;
+    else if (vehicleAge > 8) probability -= 0.2;
 
     // Select scenario based on probability
     const random = Math.random();
@@ -293,7 +309,7 @@ export class MockLenderService {
   private generateResponse(
     applicationId: string,
     lenderId: string,
-    scenario: any,
+    scenario: Scenario,
     financialData: FinancialData
   ): LenderResponse {
     const lender = this.lenders.find(l => l.id === lenderId)!;
@@ -304,14 +320,14 @@ export class MockLenderService {
         applicationId,
         lenderId,
         status: 'REJECTED',
-        message: getRandomElement(scenario.rejectionReasons),
+        message: getRandomElement(scenario.rejectionReasons || []),
         timestamp: new Date(),
       };
     }
 
     // Generate approval data
-    const interestRate = getRandomNumber(scenario.interestRateRange.min, scenario.interestRateRange.max);
-    const approvalPercentage = getRandomNumber(scenario.approvalAmountRange.min, scenario.approvalAmountRange.max);
+    const interestRate = getRandomNumber(scenario.interestRateRange?.min || 0, scenario.interestRateRange?.max || 0);
+    const approvalPercentage = getRandomNumber(scenario.approvalAmountRange?.min || 0, scenario.approvalAmountRange?.max || 0);
     const approvedAmount = Math.round(financialData.requestedAmount * approvalPercentage);
     const emiAmount = calculateEMI(approvedAmount, interestRate, financialData.tenure);
 

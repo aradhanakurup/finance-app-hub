@@ -1,5 +1,4 @@
 import { 
-  Lender, 
   LenderApplication, 
   ApplicationStatus, 
   ApplicationSubmission,
@@ -175,7 +174,15 @@ export class LenderIntegrationService {
         additionalDocuments: response.data?.additionalDocuments,
         conditions: response.data?.conditions,
         counterOffer: response.data?.counterOffer,
-        webhookData: response,
+        webhookData: {
+          success: response.success,
+          applicationId: response.applicationId,
+          lenderId: response.lenderId,
+          status: response.status,
+          message: response.message,
+          data: response.data,
+          timestamp: response.timestamp,
+        },
       });
 
       return { lenderId, response };
@@ -295,7 +302,7 @@ export class LenderIntegrationService {
     applicationId: string,
     lenderId: string,
     status: ApplicationStatus,
-    data?: any
+    data?: Record<string, unknown>
   ): Promise<void> {
     const response: LenderResponse = {
       success: true,
@@ -310,7 +317,15 @@ export class LenderIntegrationService {
     this.store.updateApplication(applicationId, lenderId, {
       status: response.status,
       respondedAt: response.timestamp,
-      webhookData: response,
+      webhookData: {
+        success: response.success,
+        applicationId: response.applicationId,
+        lenderId: response.lenderId,
+        status: response.status,
+        message: response.message,
+        data: response.data,
+        timestamp: response.timestamp,
+      },
       ...data,
     });
   }
@@ -354,9 +369,19 @@ export class LenderIntegrationService {
   }
 
   // Get lender analytics
-  async getLenderAnalytics(): Promise<any> {
+  async getLenderAnalytics(): Promise<Record<string, unknown>[]> {
     const allApplications = this.store.getAllApplications();
-    const lenderStats = new Map<string, any>();
+    const lenderStats = new Map<string, {
+      lenderId: string;
+      lenderName: string;
+      totalApplications: number;
+      approvedApplications: number;
+      rejectedApplications: number;
+      pendingApplications: number;
+      totalResponseTime: number;
+      totalInterestRate: number;
+      totalCommission: number;
+    }>();
 
     for (const app of allApplications) {
       if (!lenderStats.has(app.lenderId)) {

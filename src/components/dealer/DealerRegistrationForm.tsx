@@ -33,7 +33,7 @@ const businessTypes = [
   { value: 'COMPANY', label: 'Private Limited Company' },
 ];
 
-const dealershipTypes = [
+const dealershipTypes: Array<{ value: "CAR" | "BIKE" | "COMMERCIAL" | "MULTI_BRAND"; label: string }> = [
   { value: 'CAR', label: 'Car Dealership' },
   { value: 'BIKE', label: 'Bike Dealership' },
   { value: 'COMMERCIAL', label: 'Commercial Vehicle' },
@@ -61,7 +61,7 @@ export default function DealerRegistrationForm() {
     resolver: zodResolver(dealerSchema),
   });
 
-  const selectedDealershipTypes = watch('dealershipType') || [];
+  const selectedDealershipTypes = watch('dealershipType') as ("CAR" | "BIKE" | "COMMERCIAL" | "MULTI_BRAND")[] || [];
 
   const onSubmit = async (data: DealerFormData) => {
     setIsSubmitting(true);
@@ -99,7 +99,7 @@ export default function DealerRegistrationForm() {
     }
   };
 
-  const handleDealershipTypeChange = (type: string) => {
+  const handleDealershipTypeChange = (type: "CAR" | "BIKE" | "COMMERCIAL" | "MULTI_BRAND") => {
     const current = selectedDealershipTypes;
     const updated = current.includes(type)
       ? current.filter(t => t !== type)

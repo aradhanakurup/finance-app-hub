@@ -21,25 +21,50 @@ export default function LenderSelection({
   const [lenders, setLenders] = useState<Lender[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     fetchLenders();
   }, []);
 
-  const fetchLenders = async () => {
+  const fetchLenders = async (isRetry = false) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/lenders');
+      setError(null); // Clear any previous errors
+      
+      const response = await fetch('/api/lenders', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         setLenders(data.data);
+        setRetryCount(0); // Reset retry count on success
       } else {
         setError(data.message || 'Failed to fetch lenders');
       }
     } catch (error) {
-      setError('Failed to fetch lenders');
       console.error('Error fetching lenders:', error);
+      
+      // Retry logic with exponential backoff
+      if (!isRetry && retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchLenders(true);
+        }, delay);
+        return;
+      }
+      
+      setError('Failed to fetch lenders. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -121,7 +146,7 @@ export default function LenderSelection({
         <div className="text-red-500 mb-4">⚠️</div>
         <p className="text-gray-600">{error}</p>
         <button
-          onClick={fetchLenders}
+          onClick={() => fetchLenders()}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           Retry
@@ -137,7 +162,7 @@ export default function LenderSelection({
           Select Lenders for Application
         </h3>
         <p className="text-gray-600 text-sm">
-          Choose the lenders you want to submit your application to. We'll automatically select the best matches based on your profile.
+          Choose the lenders you want to submit your application to. We&apos;ll automatically select the best matches based on your profile.
         </p>
       </div>
 
@@ -256,7 +281,7 @@ export default function LenderSelection({
             <p className="text-sm text-blue-700">
               {selectedLenders.length > 0
                 ? `Applications will be submitted to ${selectedLenders.length} lender(s)`
-                : 'No lenders selected. We\'ll auto-select the best matches.'}
+                : 'No lenders selected. We&apos;ll auto-select the best matches.'}
             </p>
           </div>
           {selectedLenders.length > 0 && (

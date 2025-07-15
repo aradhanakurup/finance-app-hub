@@ -41,7 +41,7 @@ export interface LenderApplication {
     tenure: number;
     rate: number;
   };
-  webhookData?: any;
+  webhookData?: Record<string, unknown>;
   retryCount: number;
   lastRetryAt?: Date;
 }

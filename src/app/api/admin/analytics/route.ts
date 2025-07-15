@@ -1,16 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { asyncHandler } from '@/middleware/errorHandler';
+import { PrismaClient } from '@/generated/prisma';
+import { errorHandler, AppError } from '@/middleware/errorHandler';
 
 const prisma = new PrismaClient();
+
+// Add type definitions for Application and LenderApplication
+
+type LenderApplication = {
+  status: string;
+  lenderId: string;
+  respondedAt?: Date | string | null;
+  submittedAt: Date | string;
+};
+
+type Application = {
+  status: string;
+  lenderApplications: LenderApplication[];
+  createdAt: Date | string;
+};
+
+type LenderStat = { lenderId: string; _count: { id: number }; _avg: { responseTime: number } };
 
 async function getAnalytics(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const range = searchParams.get('range') || '30d';
+  const type = searchParams.get('type');
 
   // Calculate date range
   const now = new Date();
-  let startDate = new Date();
+  const startDate = new Date();
   
   switch (range) {
     case '7d':
@@ -42,15 +60,15 @@ async function getAnalytics(req: NextRequest) {
   });
 
   const totalApplications = applications.length;
-  const submittedApplications = applications.filter(app => app.status === 'SUBMITTED').length;
-  const approvedApplications = applications.filter(app => 
-    app.lenderApplications.some(la => la.status === 'APPROVED')
+  const submittedApplications = applications.filter((app: Application) => app.status === 'SUBMITTED').length;
+  const approvedApplications = applications.filter((app: Application) => 
+    app.lenderApplications.some((la: LenderApplication) => la.status === 'APPROVED')
   ).length;
-  const rejectedApplications = applications.filter(app => 
-    app.lenderApplications.every(la => la.status === 'REJECTED')
+  const rejectedApplications = applications.filter((app: Application) => 
+    app.lenderApplications.every((la: LenderApplication) => la.status === 'REJECTED')
   ).length;
-  const pendingApplications = applications.filter(app => 
-    app.lenderApplications.some(la => la.status === 'PENDING' || la.status === 'UNDER_REVIEW')
+  const pendingApplications = applications.filter((app: Application) => 
+    app.lenderApplications.some((la: LenderApplication) => la.status === 'PENDING' || la.status === 'UNDER_REVIEW')
   ).length;
 
   // Get lender performance
@@ -72,15 +90,15 @@ async function getAnalytics(req: NextRequest) {
   const lenders = await prisma.lender.findMany({
     where: {
       id: {
-        in: lenderStats.map(stat => stat.lenderId),
+        in: lenderStats.map((stat) => stat.lenderId),
       },
     },
   });
 
-  const lenderPerformance = lenders.map(lender => {
-    const stats = lenderStats.find(stat => stat.lenderId === lender.id);
-    const approvedCount = applications.filter(app =>
-      app.lenderApplications.some(la => 
+  const lenderPerformance = lenders.map((lender: { id: string; name: string }) => {
+    const stats = lenderStats.find((stat) => stat.lenderId === lender.id);
+    const approvedCount = applications.filter((app: Application) =>
+      app.lenderApplications.some((la: LenderApplication) => 
         la.lenderId === lender.id && la.status === 'APPROVED'
       )
     ).length;
@@ -89,7 +107,7 @@ async function getAnalytics(req: NextRequest) {
       name: lender.name,
       applications: stats?._count.id || 0,
       approvalRate: stats?._count.id ? (approvedCount / stats._count.id) * 100 : 0,
-      avgResponseTime: stats?._avg.responseTime || 0,
+      avgResponseTime: stats?._avg.responseTime ?? 0,
     };
   });
 
@@ -106,13 +124,13 @@ async function getAnalytics(req: NextRequest) {
     },
   });
 
-  const monthlyTrends = monthlyData.reduce((acc, data) => {
+  const monthlyTrends = monthlyData.reduce((acc: Array<{ month: string; applications: number; approvals: number; revenue: number }>, data: { createdAt: Date; _count: { id: number } }) => {
     const month = new Date(data.createdAt).toLocaleDateString('en-US', { 
       month: 'short', 
       year: 'numeric' 
     });
     
-    const existing = acc.find(item => item.month === month);
+    const existing = acc.find((item) => item.month === month);
     if (existing) {
       existing.applications += data._count.id;
     } else {
@@ -124,7 +142,7 @@ async function getAnalytics(req: NextRequest) {
       });
     }
     return acc;
-  }, [] as Array<{ month: string; applications: number; approvals: number; revenue: number }>);
+  }, []);
 
   // Calculate time metrics
   const approvedLenderApps = await prisma.lenderApplication.findMany({
@@ -141,7 +159,7 @@ async function getAnalytics(req: NextRequest) {
   });
 
   const avgProcessingTime = approvedLenderApps.length > 0
-    ? approvedLenderApps.reduce((sum, app) => {
+    ? approvedLenderApps.reduce((sum: number, app: { submittedAt: Date | string; respondedAt?: Date | string | null }) => {
         const processingTime = app.respondedAt 
           ? (new Date(app.respondedAt).getTime() - new Date(app.submittedAt).getTime()) / (1000 * 60 * 60)
           : 0;
@@ -156,6 +174,30 @@ async function getAnalytics(req: NextRequest) {
     positiveFeedback: 87,
   };
 
+  // Return different formats based on type parameter
+  if (type === 'overview') {
+    // Format expected by AdminDashboard
+    return NextResponse.json({
+      success: true,
+      data: {
+        overview: {
+          totalApplications,
+          approvedApplications,
+          activeApplications: submittedApplications + pendingApplications,
+          monthlyRevenue: 0, // Mock data
+        },
+        performance: {
+          avgApprovalRate: totalApplications > 0 ? approvedApplications / totalApplications : 0,
+          avgResponseTime: Math.round(avgProcessingTime),
+          avgInterestRate: 12.5, // Mock data
+        },
+        topLenders: lenderPerformance.slice(0, 5),
+        recentApplications: [], // Mock data for now
+      },
+    });
+  }
+
+  // Default format for analytics dashboard
   return NextResponse.json({
     applications: {
       total: totalApplications,
@@ -175,4 +217,10 @@ async function getAnalytics(req: NextRequest) {
   });
 }
 
-export const GET = asyncHandler(getAnalytics); 
+export async function GET(req: NextRequest, context: { params: Promise<Record<string, string>> }) {
+  try {
+    return await getAnalytics(req);
+  } catch (error) {
+    return errorHandler(error as AppError, req);
+  }
+} 

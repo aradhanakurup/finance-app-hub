@@ -198,7 +198,7 @@ export function PersonalInfoStep({ data, onUpdate }: PersonalInfoStepProps) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Father's/Husband's Name *
+            Father&apos;s/Husband&apos;s Name *
           </label>
           <input
             type="text"

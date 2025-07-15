@@ -74,7 +74,7 @@ export function ReviewStep({ applicationData, onSubmit, isSubmitting }: ReviewSt
               <p className="text-gray-900">{applicationData.personalInfo?.maritalStatus}</p>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Father's/Husband's Name:</span>
+              <span className="font-medium text-gray-700">Father&apos;s/Husband&apos;s Name:</span>
               <p className="text-gray-900">{applicationData.personalInfo?.fatherHusbandName}</p>
             </div>
             <div>

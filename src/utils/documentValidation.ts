@@ -3,7 +3,7 @@
 export interface ValidationResult {
   isValid: boolean
   confidence: number
-  extractedData: any
+  extractedData: Record<string, unknown>
   errors: string[]
   warnings: string[]
 }
@@ -14,7 +14,7 @@ export interface DocumentType {
   validationRules: {
     ocr?: string
     requiredFields?: string[]
-    formatValidation?: any
+    formatValidation?: Record<string, unknown>
   }
 }
 
@@ -184,12 +184,43 @@ export const validateImageQuality = async (file: File): Promise<ValidationResult
   })
 }
 
+// Define a type for extractedData
+export type ExtractedData = {
+  [key: string]: unknown;
+  aadhaarNumber?: string;
+  name?: string;
+  dateOfBirth?: string;
+  photo?: string;
+  gender?: string;
+  address?: string;
+  pinCode?: string;
+  state?: string;
+  district?: string;
+  panNumber?: string;
+  fatherName?: string;
+  employerName?: string;
+  employeeName?: string;
+  salary?: string;
+  date?: string;
+  employeeId?: string;
+  department?: string;
+  accountNumber?: string;
+  accountHolder?: string;
+  bankName?: string;
+  branch?: string;
+  ifscCode?: string;
+  balance?: string;
+  transactions?: string;
+  text?: string;
+  confidence?: number;
+};
+
 // Simulate OCR processing
-export const simulateOCR = async (file: File, documentType: string): Promise<any> => {
+export const simulateOCR = async (file: File, documentType: string): Promise<{ extractedData: ExtractedData; confidence: number }> => {
   // Simulate processing time
   await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
 
-  const extractedData: any = {}
+  const extractedData: ExtractedData = {}
 
   switch (documentType) {
     case 'aadhaar-front':
@@ -245,7 +276,7 @@ export const simulateOCR = async (file: File, documentType: string): Promise<any
 }
 
 // Validate extracted data against document type rules
-export const validateExtractedData = (extractedData: any, documentType: string): ValidationResult => {
+export const validateExtractedData = (extractedData: ExtractedData, documentType: string): ValidationResult => {
   const errors: string[] = []
   const warnings: string[] = []
   let isValid = true
@@ -265,7 +296,7 @@ export const validateExtractedData = (extractedData: any, documentType: string):
   // Check required fields
   if (docType.validationRules.requiredFields) {
     for (const field of docType.validationRules.requiredFields) {
-      if (!extractedData[field]) {
+      if (!(field in extractedData) || !extractedData[field]) {
         errors.push(`Required field "${field}" not detected`)
         isValid = false
       }
@@ -275,7 +306,12 @@ export const validateExtractedData = (extractedData: any, documentType: string):
   // Validate format patterns
   if (docType.validationRules.formatValidation) {
     for (const [field, pattern] of Object.entries(docType.validationRules.formatValidation)) {
-      if (extractedData[field] && pattern instanceof RegExp && !pattern.test(extractedData[field])) {
+      if (
+        extractedData[field] &&
+        pattern instanceof RegExp &&
+        typeof extractedData[field] === "string" &&
+        !pattern.test(extractedData[field] as string)
+      ) {
         errors.push(`Invalid format for "${field}": ${extractedData[field]}`)
         isValid = false
       }

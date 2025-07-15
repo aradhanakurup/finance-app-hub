@@ -208,7 +208,7 @@ export function DocumentValidation({
     const errors: string[] = []
     const warnings: string[] = []
     let isValid = true
-    let confidence = ocrResult.confidence
+    const confidence = ocrResult.confidence
 
     const { extractedData } = ocrResult
 

@@ -219,7 +219,7 @@ export default function SupportCenter() {
           <div>
             <h2 className="text-2xl font-semibold mb-4">Contact Support</h2>
             <p className="text-gray-600 mb-6">
-              Can't find what you're looking for? Our support team is here to help.
+              Can&apos;t find what you&apos;re looking for? Our support team is here to help.
             </p>
 
             <div className="space-y-4">

@@ -53,10 +53,10 @@ export function errorHandler(
   );
 }
 
-export function asyncHandler(fn: Function) {
-  return async (req: NextRequest, ...args: any[]) => {
+export function asyncHandler(fn: (req: NextRequest, context?: { params?: Record<string, string> }) => Promise<NextResponse>) {
+  return async (req: NextRequest, context?: { params?: Record<string, string> }) => {
     try {
-      return await fn(req, ...args);
+      return await fn(req, context);
     } catch (error) {
       return errorHandler(error as AppError, req);
     }

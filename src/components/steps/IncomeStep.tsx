@@ -341,7 +341,7 @@ export function IncomeStep({ data, onUpdate }: IncomeStepProps) {
             <option value="good">Good (700-749)</option>
             <option value="fair">Fair (650-699)</option>
             <option value="poor">Poor (300-649)</option>
-            <option value="unknown">Don't Know</option>
+            <option value="unknown">Don&apos;t Know</option>
           </select>
         </div>
 
