@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ApplicationWizard } from '@/components/ApplicationWizard'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { Fin5Logo } from '@/components/Fin5Logo'
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -11,8 +12,11 @@ export default function Home() {
     personalInfo: {},
     employment: {},
     income: {},
+    expenses: {},
     references: {},
     vehicle: {},
+    enhancedData: {},
+    prescreening: {},
     documents: {}
   })
 
@@ -35,29 +39,46 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <div className="mb-4">
-              <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-3xl">🚗</span>
+              <div className="flex justify-center mb-4">
+                <Fin5Logo size="lg" showTagline={true} />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Indian Auto Finance Hub
+            <h1 className="text-4xl font-bold text-blue-900 mb-4">
+              Fin5
             </h1>
-            <p className="text-xl text-gray-600 mb-4">
-              Streamline your car financing process with leading Indian banks and NBFCs
+            <p className="text-xl text-blue-700 mb-4">
+              Streamline your financing process with leading Indian banks and NBFCs
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
+            <p className="text-lg text-blue-600 mb-4 font-medium">
+              Finance. Fast. Five minutes flat.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500 mb-6">
               <span className="flex items-center">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                 RBI Compliant
               </span>
               <span className="flex items-center">
-                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                 KYC Verified
               </span>
               <span className="flex items-center">
                 <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
                 Multi-Lender Support
               </span>
+            </div>
+            
+            {/* Quick Check CTA */}
+            <div className="mb-8">
+              <a
+                href="/prescreening"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Quick Eligibility Check
+              </a>
+              <p className="text-sm text-gray-500 mt-2">Get instant loan eligibility without full application</p>
             </div>
             
             {/* Admin Dashboard Link */}

@@ -64,7 +64,7 @@ export function VehicleStep({ data, onUpdate }: VehicleStepProps) {
 
   useEffect(() => {
     onUpdate(formData)
-  }, [formData, onUpdate])
+  }, [formData]) // Remove onUpdate from dependencies to prevent infinite loop
 
   const handleChange = (field: keyof VehicleData, value: string | boolean) => {
     setFormData(prev => ({

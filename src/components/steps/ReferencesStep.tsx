@@ -31,7 +31,7 @@ export function ReferencesStep({ data, onUpdate }: ReferencesStepProps) {
 
   useEffect(() => {
     onUpdate(formData)
-  }, [formData, onUpdate])
+  }, [formData]) // Remove onUpdate from dependencies to prevent infinite loop
 
   const handleReferenceChange = (index: number, field: keyof Reference, value: string) => {
     const newReferences = [...formData.references]

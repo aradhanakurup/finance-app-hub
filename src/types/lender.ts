@@ -162,17 +162,19 @@ export interface DocumentData {
 }
 
 export interface LenderAnalytics {
-  lenderId: string;
-  lenderName: string;
-  totalApplications: number;
-  approvedApplications: number;
-  rejectedApplications: number;
-  pendingApplications: number;
+  lenderId?: string;
+  lenderName?: string;
+  name?: string; // Alternative field name from API
+  totalApplications?: number;
+  applications?: number; // Alternative field name from API
+  approvedApplications?: number;
+  rejectedApplications?: number;
+  pendingApplications?: number;
   approvalRate: number;
   avgResponseTime: number;
-  avgInterestRate: number;
-  totalCommission: number;
-  monthlyStats: {
+  avgInterestRate?: number;
+  totalCommission?: number;
+  monthlyStats?: {
     month: string;
     applications: number;
     approvals: number;

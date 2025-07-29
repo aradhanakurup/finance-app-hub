@@ -52,7 +52,7 @@ export function PersonalInfoStep({ data, onUpdate }: PersonalInfoStepProps) {
 
   useEffect(() => {
     onUpdate(formData)
-  }, [formData, onUpdate])
+  }, [formData]) // Remove onUpdate from dependencies to prevent infinite loop
 
   const handleChange = (field: keyof PersonalInfoData, value: string) => {
     setFormData(prev => ({

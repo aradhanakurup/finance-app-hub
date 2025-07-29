@@ -234,10 +234,10 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Lenders</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {lenderAnalytics.slice(0, 6).map((lender) => (
-                    <div key={lender.lenderId} className="border rounded-lg p-4">
+                  {(lenderAnalytics || []).slice(0, 6).map((lender, index) => (
+                    <div key={lender.lenderId || lender.name || index} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-semibold text-gray-900">{lender.lenderName}</h5>
+                        <h5 className="font-semibold text-gray-900">{lender.lenderName || lender.name}</h5>
                         <span className="text-sm text-green-600 font-medium">
                           {formatPercentage(lender.approvalRate)}
                         </span>
@@ -245,7 +245,7 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Applications:</span>
-                          <span className="font-medium">{lender.totalApplications}</span>
+                          <span className="font-medium">{lender.totalApplications || lender.applications}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Avg Response:</span>
@@ -253,7 +253,7 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Commission:</span>
-                          <span className="font-medium">{formatCurrency(lender.totalCommission)}</span>
+                          <span className="font-medium">{formatCurrency(lender.totalCommission || 0)}</span>
                         </div>
                       </div>
                     </div>
@@ -292,13 +292,13 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {lenderAnalytics.map((lender) => (
-                      <tr key={lender.lenderId} className="hover:bg-gray-50">
+                    {(lenderAnalytics || []).map((lender, index) => (
+                      <tr key={lender.lenderId || lender.name || index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">{lender.lenderName}</div>
+                          <div className="font-medium text-gray-900">{lender.lenderName || lender.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {lender.totalApplications}
+                          {lender.totalApplications || lender.applications}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm font-medium text-green-600">
@@ -309,10 +309,10 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                           {lender.avgResponseTime} min
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {lender.avgInterestRate}%
+                          {lender.avgInterestRate || 0}%
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(lender.totalCommission)}
+                          {formatCurrency(lender.totalCommission || 0)}
                         </td>
                       </tr>
                     ))}
@@ -327,8 +327,8 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Recent Applications</h4>
               <div className="space-y-4">
-                {recentApplications.map((app) => (
-                  <div key={app.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                {(recentApplications || []).map((app, index) => (
+                  <div key={app.id || index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <h5 className="font-medium text-gray-900">

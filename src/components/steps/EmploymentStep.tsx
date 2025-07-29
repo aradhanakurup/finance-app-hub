@@ -56,7 +56,7 @@ export function EmploymentStep({ data, onUpdate }: EmploymentStepProps) {
 
   useEffect(() => {
     onUpdate(formData)
-  }, [formData, onUpdate])
+  }, [formData]) // Remove onUpdate from dependencies to prevent infinite loop
 
   const handleChange = (field: keyof EmploymentData, value: string) => {
     setFormData(prev => ({

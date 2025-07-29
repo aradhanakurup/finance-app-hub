@@ -1,27 +1,77 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminDashboard from '../../components/admin/AdminDashboard';
+import AnalyticsDashboard from '../../components/analytics/AnalyticsDashboard';
 import ApplicationStatusTracker from '../../components/lender-integration/ApplicationStatusTracker';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { Fin5Logo } from '../../components/Fin5Logo';
 
 export default function AdminPage() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'tracker'>('dashboard');
+  const [activeView, setActiveView] = useState<'analytics' | 'dashboard' | 'tracker'>('analytics');
   const [applicationId, setApplicationId] = useState('');
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Remove admin token cookie
+    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/admin/login');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      {/* Top Navigation */}
+      <div className="absolute top-20 left-4 z-10">
+        <a
+          href="/"
+          className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200 bg-white px-3 py-2 rounded-lg shadow-sm"
+        >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Home
+        </a>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Monitor lender performance, track applications, and manage the auto finance platform
-          </p>
+        <div className="mb-8 text-center">
+          <div className="mb-4">
+            <Fin5Logo size="lg" showTagline={true} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-blue-900">Admin Dashboard</h1>
+              <p className="text-blue-700 mt-2">
+                Monitor lender performance, track applications, and manage the Fin5 platform
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
         <div className="mb-6">
           <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveView('analytics')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeView === 'analytics'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              📊 Analytics Dashboard
+            </button>
             <button
               onClick={() => setActiveView('dashboard')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -30,7 +80,7 @@ export default function AdminPage() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              📊 Analytics Dashboard
+              📈 Performance Overview
             </button>
             <button
               onClick={() => setActiveView('tracker')}
@@ -46,7 +96,9 @@ export default function AdminPage() {
         </div>
 
         {/* Content */}
-        {activeView === 'dashboard' ? (
+        {activeView === 'analytics' ? (
+          <AnalyticsDashboard />
+        ) : activeView === 'dashboard' ? (
           <AdminDashboard />
         ) : (
           <div className="space-y-6">
@@ -86,6 +138,8 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 } 

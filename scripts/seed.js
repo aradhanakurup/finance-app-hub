@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('../src/generated/prisma');
 
 const prisma = new PrismaClient();
 
@@ -54,8 +54,8 @@ async function seed() {
         minLoanAmount: 100000,
         processingFee: 2500,
         commissionRate: 2.5,
-        supportedVehicleTypes: ['CAR', 'BIKE', 'COMMERCIAL'],
-        supportedEmploymentTypes: ['SALARIED', 'SELF_EMPLOYED', 'BUSINESS']
+        supportedVehicleTypes: JSON.stringify(['CAR', 'BIKE', 'COMMERCIAL']),
+        supportedEmploymentTypes: JSON.stringify(['SALARIED', 'SELF_EMPLOYED', 'BUSINESS'])
       },
       {
         name: 'ICICI Bank',
@@ -69,8 +69,8 @@ async function seed() {
         minLoanAmount: 50000,
         processingFee: 2000,
         commissionRate: 2.0,
-        supportedVehicleTypes: ['CAR', 'BIKE'],
-        supportedEmploymentTypes: ['SALARIED', 'SELF_EMPLOYED']
+        supportedVehicleTypes: JSON.stringify(['CAR', 'BIKE']),
+        supportedEmploymentTypes: JSON.stringify(['SALARIED', 'SELF_EMPLOYED'])
       }
     ];
 
