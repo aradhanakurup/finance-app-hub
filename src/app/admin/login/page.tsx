@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Fin5Logo } from '../../components/Fin5Logo';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -51,7 +50,9 @@ export default function AdminLoginPage() {
             Back to Home
           </Link>
         </div>
-        <Fin5Logo size="lg" showTagline={false} />
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-blue-600">Fin5</h1>
+        </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Admin Login
         </h2>
