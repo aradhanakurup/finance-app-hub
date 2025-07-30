@@ -7,7 +7,6 @@ import AnalyticsDashboard from '../../components/analytics/AnalyticsDashboard';
 import ApplicationStatusTracker from '../../components/lender-integration/ApplicationStatusTracker';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { Fin5Logo } from '../../components/Fin5Logo';
 import Link from 'next/link';
 
 export default function AdminPage() {
