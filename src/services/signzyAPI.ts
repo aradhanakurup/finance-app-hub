@@ -137,10 +137,10 @@ export class SignzyAPI {
 
       const data = await response.json()
       
-      if (data.success) {
+      if (data.success && data.accessToken) {
         this.accessToken = data.accessToken
         this.tokenExpiry = Date.now() + (data.expiresIn * 1000)
-        return this.accessToken
+        return data.accessToken
       } else {
         throw new Error('Authentication failed')
       }
