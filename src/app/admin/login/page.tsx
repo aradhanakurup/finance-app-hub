@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
           </Link>
         </div>
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-blue-600">Fin5</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Fin5 Admin</h1>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Admin Login
