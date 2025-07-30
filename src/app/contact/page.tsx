@@ -17,11 +17,11 @@ export default function ContactPage() {
             <div className="mb-6">
               <Fin5Logo size="lg" showTagline={true} />
             </div>
-            <h1 className="text-4xl font-bold text-blue-900 mb-4">
-              Contact Us
+            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+              Get in Touch
             </h1>
-            <p className="text-xl text-blue-700 mb-6">
-              Get in touch with the Fin5 team
+            <p className="text-xl text-gray-600 mb-8">
+              We&apos;re here to help you with all your financial needs. Reach out to us anytime.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed">
               Have questions about our services? Need support with your application? 

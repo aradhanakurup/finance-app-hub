@@ -8,6 +8,7 @@ import ApplicationStatusTracker from '../../components/lender-integration/Applic
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { Fin5Logo } from '../../components/Fin5Logo';
+import Link from 'next/link';
 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<'analytics' | 'dashboard' | 'tracker'>('analytics');
@@ -26,7 +27,7 @@ export default function AdminPage() {
       
       {/* Top Navigation */}
       <div className="absolute top-20 left-4 z-10">
-        <a
+        <Link
           href="/"
           className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200 bg-white px-3 py-2 rounded-lg shadow-sm"
         >
@@ -34,29 +35,16 @@ export default function AdminPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back to Home
-        </a>
+        </Link>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="mb-4">
-            <Fin5Logo size="lg" showTagline={true} />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-blue-900">Admin Dashboard</h1>
-              <p className="text-blue-700 mt-2">
-                Monitor lender performance, track applications, and manage the Fin5 platform
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
-            >
-              Logout
-            </button>
-          </div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm">
+            ← Back to Home
+          </Link>
         </div>
 
         {/* Navigation Tabs */}

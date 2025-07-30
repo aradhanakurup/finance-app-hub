@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Header } from '../../../components/Header';
 import { Footer } from '../../../components/Footer';
 import { Fin5Logo } from '../../../components/Fin5Logo';
+import Link from 'next/link';
 
 export default function DealerLoginPage() {
   const [formData, setFormData] = useState({
@@ -61,8 +62,12 @@ export default function DealerLoginPage() {
             <div className="mb-6">
               <Fin5Logo size="lg" showTagline={true} />
             </div>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">Dealer Portal</h1>
-            <p className="text-blue-700">Access your dealership dashboard and manage applications</p>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Dealer Login
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Access your dealer dashboard
+            </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8">
@@ -143,11 +148,17 @@ export default function DealerLoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have a dealer account?{' '}
-                <a href="/dealer/register" className="text-blue-600 hover:text-blue-500 font-medium">
+                Don&apos;t have an account?{' '}
+                <Link href="/dealer/register" className="font-medium text-blue-600 hover:text-blue-500">
                   Register here
-                </a>
+                </Link>
               </p>
+              <Link href="/" className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-700 text-sm">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Home
+              </Link>
             </div>
           </div>
 

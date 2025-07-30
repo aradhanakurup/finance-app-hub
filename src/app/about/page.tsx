@@ -17,15 +17,14 @@ export default function AboutPage() {
             <div className="mb-6">
               <Fin5Logo size="lg" showTagline={true} />
             </div>
-            <h1 className="text-4xl font-bold text-blue-900 mb-4">
-              About Fin5
+            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+              About Fin5 - Your Trusted Financial Partner
             </h1>
-            <p className="text-xl text-blue-700 mb-6">
-              From "I Want a Loan" to "Approved" – In Just 5 Minutes.
+            <p className="text-xl text-gray-600 mb-8">
+              We&apos;re revolutionizing the way people access financial services. Our mission is to make finance accessible, transparent, and efficient for everyone.
             </p>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Welcome to Fin5, the smartest way to get your loan approved. We're not just a loan application. 
-              We're your financial wellness partner, built for speed, trust, and complete RBI compliance.
+            <p className="text-lg text-gray-700 mb-6">
+              At Fin5, we believe that financial services shouldn&apos;t be complicated. That&apos;s why we&apos;ve built a platform that connects borrowers with lenders in just five minutes.
             </p>
           </div>
 

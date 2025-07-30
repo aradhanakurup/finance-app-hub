@@ -6,6 +6,7 @@ import { Footer } from '../../../components/Footer';
 import { Fin5Logo } from '../../../components/Fin5Logo';
 import PlanSelection from '../../../components/dealer/PlanSelection';
 import PaymentForm from '../../../components/dealer/PaymentForm';
+import Link from 'next/link';
 
 export default function DealerRegistrationPage() {
   const [step, setStep] = useState<'form' | 'plan' | 'payment' | 'success'>('form');
@@ -139,8 +140,12 @@ export default function DealerRegistrationPage() {
             <div className="mb-6">
               <Fin5Logo size="lg" showTagline={true} />
             </div>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">Dealer Registration</h1>
-            <p className="text-blue-700">Join Fin5 as a dealer and streamline your financing process</p>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Dealer Registration
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Join our network of trusted dealers
+            </p>
           </div>
 
           {/* Progress Steps */}
@@ -458,13 +463,13 @@ export default function DealerRegistrationPage() {
                   />
                   <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                     I agree to the{' '}
-                    <a href="/terms" className="text-blue-600 hover:text-blue-500">
+                    <Link href="/terms" className="text-blue-600 hover:text-blue-500">
                       Terms of Service
-                    </a>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <a href="/privacy" className="text-blue-600 hover:text-blue-500">
+                    <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
                       Privacy Policy
-                    </a>
+                    </Link>
                   </label>
                 </div>
 
@@ -519,9 +524,18 @@ export default function DealerRegistrationPage() {
           )}
 
           <div className="mt-8 text-center">
-            <a href="/" className="text-blue-600 hover:text-blue-500 text-sm">
-              ← Back to Fin5 Home
-            </a>
+            <p className="text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link href="/dealer/login" className="font-medium text-blue-600 hover:text-blue-500">
+                Sign in here
+              </Link>
+            </p>
+            <Link href="/" className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-700 text-sm">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Home
+            </Link>
           </div>
         </div>
       </main>

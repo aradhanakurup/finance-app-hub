@@ -1,5 +1,6 @@
 import { Fin5Logo } from './Fin5Logo'
 import { MobileNavigation } from './MobileNavigation'
+import Link from 'next/link';
 
 export function Header() {
   return (
@@ -8,8 +9,10 @@ export function Header() {
         {/* Main Header */}
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
-          <div className="flex items-center space-x-6">
-            <Fin5Logo size="lg" />
+          <div className="flex items-center space-x-8">
+            <Link href="/" className="text-xl font-bold text-blue-600 hover:text-blue-700">
+              Fin5
+            </Link>
             <div className="hidden lg:block">
               <p className="text-sm text-blue-700 font-medium">
                 Streamline your financing process with leading Indian banks and NBFCs

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Fin5Logo } from './Fin5Logo';
+import Link from 'next/link';
 
 export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,13 +42,13 @@ export function MobileNavigation() {
           <div className="px-4 py-6 space-y-4">
             {/* Navigation Links */}
             <div className="space-y-2">
-              <a 
+              <Link 
                 href="/" 
                 onClick={closeMenu}
                 className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium"
               >
                 Home
-              </a>
+              </Link>
               <a 
                 href="/prescreening" 
                 onClick={closeMenu}

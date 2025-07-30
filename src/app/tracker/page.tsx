@@ -31,8 +31,12 @@ export default function TrackerPage() {
             <div className="flex items-center space-x-4">
               <Fin5Logo size="md" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Application Tracker</h1>
-                <p className="text-sm text-gray-600">Track your loan applications</p>
+                <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                  Track Your Applications
+                </h1>
+                <p className="text-xl text-gray-600 mb-8">
+                  Monitor the status of your loan applications and stay updated on your progress.
+                </p>
               </div>
             </div>
           </div>

@@ -148,11 +148,9 @@ export function PrescreeningStep({ data, onUpdate, applicationData }: Prescreeni
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Loan Eligibility Analysis
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to Check Eligibility</h3>
         <p className="text-gray-600">
-          We're analyzing your profile to determine loan eligibility and provide personalized recommendations
+          Click &quot;Run Prescreening&quot; to check your loan eligibility and get personalized offers.
         </p>
       </div>
 
