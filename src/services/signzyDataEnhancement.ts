@@ -508,7 +508,10 @@ export class SignzyDataEnhancement {
     if (!bankStatement) return { score: 0, factors: [] }
 
     // Bounced cheques
-    if (bankStatement.bouncedCheques === 0) {
+    if (bankStatement.bouncedCheques === undefined) {
+      // No data available
+      factors.push('Bounced cheque data unavailable')
+    } else if (bankStatement.bouncedCheques === 0) {
       score += 8
     } else if (bankStatement.bouncedCheques <= 1) {
       score += 4
