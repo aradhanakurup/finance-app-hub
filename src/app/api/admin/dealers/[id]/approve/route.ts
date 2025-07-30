@@ -28,18 +28,18 @@ export async function POST(
       throw new CustomError('Dealer not found', 404);
     }
 
-    if (dealer.status !== 'PENDING') {
-      throw new CustomError('Dealer is not in pending status', 400);
+    if (dealer.isApproved) {
+      throw new CustomError('Dealer is already approved', 400);
     }
 
     // Update dealer status
     const updatedDealer = await prisma.dealer.update({
       where: { id },
       data: {
-        status: validatedData.status,
+        isApproved: validatedData.status === 'APPROVED',
+        isActive: validatedData.status === 'APPROVED',
         approvedBy: 'admin', // In production, get from auth context
-        approvedAt: new Date(),
-        rejectionReason: validatedData.status === 'REJECTED' ? validatedData.reason : null,
+        approvedAt: validatedData.status === 'APPROVED' ? new Date() : null,
       },
     });
 
@@ -49,8 +49,8 @@ export async function POST(
         action: `DEALER_${validatedData.status}`,
         entityType: 'DEALER',
         entityId: id,
-        oldValues: dealer,
-        newValues: updatedDealer,
+        oldValues: JSON.stringify(dealer),
+        newValues: JSON.stringify(updatedDealer),
         userId: 'admin', // In production, get from auth context
         ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
         userAgent: req.headers.get('user-agent'),
