@@ -79,7 +79,7 @@ export function PaymentStep({ applicationData, onDataUpdate, onNext, onPrevious 
     }
   }
 
-  const handleInsuranceSelection = async (quote: InsuranceQuote) => {
+  const handleInsuranceSelection = async (quote: InsuranceQuote | null) => {
     setSelectedInsurance(quote)
     
     // Reload cost breakdown with selected insurance

@@ -219,7 +219,7 @@ export class PaymentService {
         where: { paymentId },
         data: {
           status: PaymentStatus.FAILED,
-          failureReason: error.message,
+          failureReason: error instanceof Error ? error.message : 'Unknown error',
         },
       });
 
@@ -271,7 +271,6 @@ export class PaymentService {
       where: { id: applicationId },
       data: {
         status: 'PAID',
-        paidAt: new Date(),
       },
     });
 
@@ -312,7 +311,6 @@ export class PaymentService {
       where: { id: applicationId },
       data: {
         status: 'PROCESSING',
-        processingStartedAt: new Date(),
       },
     });
   }
