@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ApplicationWizard } from '@/components/ApplicationWizard'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
@@ -19,6 +19,76 @@ export default function Home() {
     prescreening: {},
     documents: {}
   })
+
+  // Check for prescreening data on component mount
+  useEffect(() => {
+    const prescreeningResults = localStorage.getItem('prescreeningResults')
+    const prescreeningFormData = localStorage.getItem('prescreeningFormData')
+    
+    if (prescreeningResults && prescreeningFormData) {
+      try {
+        const results = JSON.parse(prescreeningResults)
+        const formData = JSON.parse(prescreeningFormData)
+        
+        // Pre-populate application data with prescreening information
+        setApplicationData(prev => ({
+          ...prev,
+          personalInfo: {
+            firstName: formData.personalInfo?.firstName || '',
+            lastName: formData.personalInfo?.lastName || '',
+            email: formData.personalInfo?.email || '',
+            phone: formData.personalInfo?.phone || '',
+            aadhaar: formData.personalInfo?.aadhaar || '',
+            pan: formData.personalInfo?.pan || '',
+            dateOfBirth: formData.personalInfo?.dateOfBirth || '',
+            address: formData.personalInfo?.address || {}
+          },
+          employment: {
+            employmentType: formData.employment?.employmentType || 'SALARIED',
+            companyName: formData.employment?.companyName || '',
+            designation: formData.employment?.designation || '',
+            monthlyIncome: formData.employment?.monthlyIncome || 0,
+            experience: formData.employment?.experience || 0
+          },
+          income: {
+            monthlyIncome: formData.employment?.monthlyIncome || 0,
+            creditScore: results.customCreditScore?.customScore || 700,
+            existingEmis: 0
+          },
+          expenses: {
+            rent: formData.expenses?.rent || 0,
+            utilities: formData.expenses?.utilities || 0,
+            food: formData.expenses?.food || 0,
+            transportation: formData.expenses?.transportation || 0,
+            healthcare: formData.expenses?.healthcare || 0,
+            other: formData.expenses?.other || 0,
+            existingEmis: 0
+          },
+          vehicle: {
+            make: formData.vehicle?.make || '',
+            model: formData.vehicle?.model || '',
+            year: formData.vehicle?.year || 2024,
+            variant: formData.vehicle?.variant || '',
+            price: formData.vehicle?.price || 0,
+            downPayment: formData.vehicle?.downPayment || 0,
+            loanAmount: formData.vehicle?.loanAmount || 0,
+            tenure: formData.vehicle?.tenure || 60
+          },
+          prescreening: results
+        }))
+        
+        // Clear prescreening data from localStorage
+        localStorage.removeItem('prescreeningResults')
+        localStorage.removeItem('prescreeningFormData')
+        
+        // Show success message
+        alert('Prescreening data loaded successfully! Your application has been pre-filled with your eligibility check information.')
+        
+      } catch (error) {
+        console.error('Error loading prescreening data:', error)
+      }
+    }
+  }, [])
 
   const handleStepChange = (step: number) => {
     setCurrentStep(step)

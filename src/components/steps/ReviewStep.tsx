@@ -7,31 +7,37 @@ interface ReviewStepProps {
 }
 
 export function ReviewStep({ applicationData, onSubmit, isSubmitting }: ReviewStepProps) {
-  const formatCurrency = (amount: string) => {
+  const formatCurrency = (amount: string | number) => {
     if (!amount) return 'Not provided'
-    const cleaned = amount.replace(/[^\d]/g, '')
+    
+    // Convert to string if it's a number
+    const amountStr = typeof amount === 'number' ? amount.toString() : amount
+    
+    const cleaned = amountStr.replace(/[^\d]/g, '')
     if (cleaned) {
       return new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR'
       }).format(parseInt(cleaned))
     }
-    return amount
+    return amountStr
   }
 
-  const formatDate = (date: string) => {
+  const formatDate = (date: string | Date) => {
     if (!date) return 'Not provided'
     return new Date(date).toLocaleDateString('en-IN')
   }
 
-  const maskAadhaar = (aadhaar: string) => {
+  const maskAadhaar = (aadhaar: string | number) => {
     if (!aadhaar) return 'Not provided'
-    return aadhaar.replace(/(\d{4})-(\d{4})-(\d{4})/, '****-****-$3')
+    const aadhaarStr = typeof aadhaar === 'number' ? aadhaar.toString() : aadhaar
+    return aadhaarStr.replace(/(\d{4})-(\d{4})-(\d{4})/, '****-****-$3')
   }
 
-  const maskPAN = (pan: string) => {
+  const maskPAN = (pan: string | number) => {
     if (!pan) return 'Not provided'
-    return pan.replace(/(\w{5})(\w{4})(\w{1})/, '$1****$3')
+    const panStr = typeof pan === 'number' ? pan.toString() : pan
+    return panStr.replace(/(\w{5})(\w{4})(\w{1})/, '$1****$3')
   }
 
   return (

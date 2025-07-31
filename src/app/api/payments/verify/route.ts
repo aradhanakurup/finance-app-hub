@@ -1,44 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { PAYMENT_CONFIG } from '@/config/payments';
+import { paymentService } from '@/services/paymentService';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, dealerData } = await req.json();
+    const body = await request.json();
+    const { paymentId, razorpayPaymentId, signature } = body;
 
-    // Verify payment signature
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
-    const expectedSignature = crypto
-      .createHmac("sha256", PAYMENT_CONFIG.razorpay.keySecret)
-      .update(body.toString())
-      .digest("hex");
+    if (!paymentId || !razorpayPaymentId || !signature) {
+      return NextResponse.json(
+        { error: 'Payment ID, Razorpay payment ID, and signature are required' },
+        { status: 400 }
+      );
+    }
 
-    const isAuthentic = expectedSignature === razorpay_signature;
+    // Verify payment
+    const isVerified = await paymentService.verifyPayment(paymentId, razorpayPaymentId, signature);
 
-    if (!isAuthentic) {
+    if (!isVerified) {
       return NextResponse.json(
         { error: 'Payment verification failed' },
         { status: 400 }
       );
     }
 
-    // In production, you would:
-    // 1. Save dealer data to database
-    // 2. Create dealer account
-    // 3. Send welcome email
-    // 4. Log payment details
+    // Get updated payment details
+    const paymentDetails = await paymentService.getPaymentDetails(paymentId);
 
     return NextResponse.json({
       success: true,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
-      message: 'Payment verified successfully',
-      dealerData,
+      data: {
+        payment: paymentDetails,
+        message: 'Payment verified successfully',
+        timestamp: new Date().toISOString(),
+      },
     });
+
   } catch (error) {
     console.error('Error verifying payment:', error);
     return NextResponse.json(
-      { error: 'Payment verification failed' },
+      { error: 'Failed to verify payment' },
       { status: 500 }
     );
   }

@@ -157,6 +157,8 @@ model Application {
   vehicle               Vehicle?
   documents             Document[]
   lenderApplications    LenderApplication[]
+  insurancePolicies     InsurancePolicy[]
+  payments              Payment[]
 }
 
 // Lender Application Relationship
@@ -272,4 +274,126 @@ model AuditLog {
   ipAddress             String?
   userAgent             String?
   createdAt             DateTime @default(now())
+}
+
+// Insurance Providers
+model InsuranceProvider {
+  id                    String   @id @default(cuid())
+  name                  String   @unique
+  logo                  String?
+  apiEndpoint           String
+  apiKey                String
+  isActive              Boolean  @default(true)
+  commissionRate        Float    @default(0.15) // 15% default commission
+  supportedCoverageTypes String  // JSON string for SQLite
+  minPremium            Float    @default(0)
+  maxCoverage           Float    @default(0)
+  responseTime          Int      @default(0) // in minutes
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  policies              InsurancePolicy[]
+  claims                InsuranceClaim[]
+  analytics             InsuranceAnalytics[]
+}
+
+// Insurance Policies
+model InsurancePolicy {
+  id                    String   @id @default(cuid())
+  applicationId         String   @unique
+  providerId            String
+  policyNumber          String   @unique
+  coverageType          String   // "loan_protection", "job_loss", "critical_illness", "asset_protection"
+  premiumAmount         Float
+  coverageAmount        Float
+  startDate             DateTime
+  endDate               DateTime
+  status                String   @default("ACTIVE") // "ACTIVE", "EXPIRED", "CANCELLED", "CLAIMED"
+  customerId            String
+  loanAmount            Float
+  monthlyPremium        Float?
+  autoRenewal           Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  provider              InsuranceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  claims                InsuranceClaim[]
+}
+
+// Insurance Claims
+model InsuranceClaim {
+  id                    String   @id @default(cuid())
+  policyId              String
+  providerId            String
+  claimNumber           String   @unique
+  claimType             String   // "death", "disability", "job_loss", "asset_damage"
+  claimAmount           Float
+  status                String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED", "PAID"
+  description           String?
+  documents             String?  // JSON string for document paths
+  submittedAt           DateTime @default(now())
+  processedAt           DateTime?
+  approvedAt            DateTime?
+  paidAt                DateTime?
+  rejectionReason       String?
+  payoutAmount          Float?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  policy                InsurancePolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  provider              InsuranceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+}
+
+// Insurance Analytics
+model InsuranceAnalytics {
+  id                    String   @id @default(cuid())
+  providerId            String
+  date                  DateTime
+  totalPolicies         Int      @default(0)
+  activePolicies        Int      @default(0)
+  totalClaims           Int      @default(0)
+  approvedClaims        Int      @default(0)
+  totalPremium          Float    @default(0)
+  totalPayout           Float    @default(0)
+  claimsRatio           Float    @default(0)
+  commissionEarned      Float    @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  provider              InsuranceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, date])
+}
+
+// Payment Management
+model Payment {
+  id                    String   @id @default(cuid())
+  orderId               String   @unique
+  paymentId             String   @unique
+  customerId            String
+  applicationId         String
+  amount                Float
+  currency              String   @default("INR")
+  status                String   @default("pending") // "pending", "processing", "completed", "failed", "refunded"
+  paymentType           String   // "loan_application", "insurance_premium", "bundled_payment"
+  items                 String   // JSON string for payment items
+  customerEmail         String
+  customerPhone         String
+  customerName          String
+  razorpayOrderId       String?
+  razorpayPaymentId     String?
+  paymentUrl            String?
+  failureReason         String?
+  refundReason          String?
+  createdAt             DateTime @default(now())
+  completedAt           DateTime?
+  refundedAt            DateTime?
+
+  // Relations
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }

@@ -275,9 +275,9 @@ export function PrescreeningDashboard({
             </button>
             <button
               onClick={() => onComplete(results)}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
             >
-              Continue to Application
+              🚀 Go to Full Application
             </button>
           </div>
         </div>

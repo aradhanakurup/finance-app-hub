@@ -46,6 +46,13 @@ export default function ApplicationStatusTracker({
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
+    // Validate applicationId before making API calls
+    if (!applicationId || !/^[A-Za-z0-9-_]+$/.test(applicationId.trim())) {
+      setError('Invalid application ID format');
+      setLoading(false);
+      return;
+    }
+    
     fetchStatus();
     
     if (autoRefresh) {
@@ -55,8 +62,16 @@ export default function ApplicationStatusTracker({
   }, [applicationId, autoRefresh]);
 
   const fetchStatus = async () => {
+    // Additional validation before making the API call
+    if (!applicationId || !/^[A-Za-z0-9-_]+$/.test(applicationId.trim())) {
+      setError('Invalid application ID format');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch(`/api/applications/${applicationId}/status`);
       const data = await response.json();
       

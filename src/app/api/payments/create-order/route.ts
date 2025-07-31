@@ -1,65 +1,107 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Razorpay from 'razorpay';
-import { PAYMENT_CONFIG, calculatePaymentBreakdown } from '@/config/payments';
+import { paymentService, type PaymentRequest } from '@/services/paymentService';
 
-const razorpay = new Razorpay({
-  key_id: PAYMENT_CONFIG.razorpay.keyId,
-  key_secret: PAYMENT_CONFIG.razorpay.keySecret,
-});
-
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { planType, dealerData } = await req.json();
+    console.log('Payment create order API called');
+    
+    const body = await request.json();
+    console.log('Request body received:', JSON.stringify(body, null, 2));
+    
+    const { applicationData, selectedInsurance, customerInfo } = body;
 
-    // Validate plan type
-    const plan = PAYMENT_CONFIG.dealerRegistration[planType as keyof typeof PAYMENT_CONFIG.dealerRegistration];
-    if (!plan) {
+    if (!applicationData || !customerInfo) {
+      console.log('Missing required data:', { hasApplicationData: !!applicationData, hasCustomerInfo: !!customerInfo });
       return NextResponse.json(
-        { error: 'Invalid plan type' },
+        { error: 'Application data and customer info are required' },
         { status: 400 }
       );
     }
 
-    // Calculate payment breakdown
-    const paymentBreakdown = calculatePaymentBreakdown(plan.price);
+    // Calculate total cost breakdown
+    const costBreakdown = await paymentService.calculateTotalCost(applicationData, selectedInsurance);
 
-    // Create Razorpay order
-    const orderData = {
-      amount: paymentBreakdown.totalAmount * 100, // Razorpay expects amount in paise
-      currency: PAYMENT_CONFIG.razorpay.currency,
-      receipt: `dealer_reg_${Date.now()}`,
-      notes: {
-        planType,
-        dealerEmail: dealerData.email,
-        businessName: dealerData.businessName,
+    // Prepare payment items
+    const paymentItems: any[] = [];
+
+    // Add loan application fee
+    paymentItems.push({
+      type: 'loan_application',
+      description: 'Loan Application Processing Fee',
+      amount: costBreakdown.breakdown.applicationFee,
+      quantity: 1,
+      total: costBreakdown.breakdown.applicationFee,
+      metadata: {
+        applicationId: applicationData.id || `APP-${Date.now()}`,
+        features: applicationData.premiumFeatures || {},
       },
-      prefill: {
-        name: dealerData.ownerName,
-        email: dealerData.email,
-        contact: dealerData.phone,
+    });
+
+    // Add insurance premium if selected
+    if (selectedInsurance) {
+      paymentItems.push({
+        type: 'insurance_premium',
+        description: `${selectedInsurance.providerName} - ${selectedInsurance.coverageType.replace('_', ' ').toUpperCase()}`,
+        amount: costBreakdown.breakdown.insuranceCost,
+        quantity: 1,
+        total: costBreakdown.breakdown.insuranceCost,
+        metadata: {
+          providerId: selectedInsurance.providerId,
+          coverageType: selectedInsurance.coverageType,
+          riskProfile: {
+            creditScore: applicationData.prescreening?.creditScore || 650,
+            employmentType: applicationData.employment?.employmentType || 'salaried',
+            monthlyIncome: applicationData.income?.monthlyIncome || 50000,
+            loanAmount: applicationData.vehicle?.loanAmount || 500000,
+            loanTenure: applicationData.vehicle?.tenure || 60,
+            vehicleType: applicationData.vehicle?.make || 'sedan',
+            age: applicationData.personalInfo?.age || 30,
+            healthStatus: 'good',
+            occupation: applicationData.employment?.designation || 'employee',
+            experience: applicationData.employment?.experience || 3,
+            existingEmis: applicationData.expenses?.existingEmis || 0,
+            customerId: customerInfo.email || '',
+          },
+        },
+      });
+    }
+
+    // Create payment request
+    const paymentRequest: PaymentRequest = {
+      customerId: customerInfo.email || `CUST-${Date.now()}`,
+      applicationId: applicationData.id || `APP-${Date.now()}`,
+      items: paymentItems,
+      totalAmount: costBreakdown.breakdown.total,
+      currency: costBreakdown.currency,
+      customerEmail: customerInfo.email,
+      customerPhone: customerInfo.phone,
+      customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+    };
+
+    console.log('Creating payment order...');
+    
+    // Create payment order
+    const paymentResponse = await paymentService.createPaymentOrder(paymentRequest);
+    console.log('Payment order created:', paymentResponse);
+
+    const response = {
+      success: true,
+      data: {
+        payment: paymentResponse,
+        costBreakdown,
+        paymentItems,
+        timestamp: new Date().toISOString(),
       },
     };
 
-    const order = await razorpay.orders.create(orderData);
+    console.log('Sending response:', JSON.stringify(response, null, 2));
+    
+    return NextResponse.json(response);
 
-    return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      planDetails: {
-        name: plan.name,
-        price: plan.price,
-        duration: plan.duration,
-        features: plan.features,
-      },
-      paymentBreakdown,
-      keyId: PAYMENT_CONFIG.razorpay.keyId,
-    });
   } catch (error) {
     console.error('Error creating payment order:', error);
     return NextResponse.json(
-      { error: 'Failed to create payment order' },
+      { error: 'Failed to create payment order', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

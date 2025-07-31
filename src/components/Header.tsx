@@ -10,8 +10,8 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center space-x-8">
-            <Link href="/" className="text-xl font-bold text-blue-600 hover:text-blue-700">
-              Fin5
+            <Link href="/" className="hover:opacity-80 transition-opacity duration-200">
+              <Fin5Logo size="md" showTagline={false} />
             </Link>
             <div className="hidden lg:block">
               <p className="text-sm text-blue-700 font-medium">

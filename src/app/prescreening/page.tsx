@@ -81,7 +81,12 @@ export default function PrescreeningPage() {
 
   const handlePrescreeningComplete = (results: any) => {
     console.log('Prescreening completed:', results)
-    // You can store results or redirect to application
+    // Store prescreening results in localStorage for the main application
+    localStorage.setItem('prescreeningResults', JSON.stringify(results))
+    localStorage.setItem('prescreeningFormData', JSON.stringify(formData))
+    
+    // Redirect to main application with prescreening data
+    window.location.href = '/?prescreening=true'
   }
 
   if (!showForm) {

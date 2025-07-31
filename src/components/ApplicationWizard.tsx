@@ -10,6 +10,8 @@ import { ReferencesStep } from './steps/ReferencesStep'
 import { VehicleStep } from './steps/VehicleStep'
 import { PrescreeningStep } from './steps/PrescreeningStep'
 import { DocumentUploadStep } from './steps/DocumentUploadStep'
+import { InsuranceStep } from './steps/InsuranceStep'
+import { PaymentStep } from './steps/PaymentStep'
 import LenderSelection from './lender-integration/LenderSelection'
 import { ReviewStep } from './steps/ReviewStep'
 import { EnhancedApplicationView } from './application/EnhancedApplicationView'
@@ -45,8 +47,10 @@ export function ApplicationWizard({
     { id: 7, title: 'Data Enhancement', description: 'Signzy Verification' },
     { id: 8, title: 'Prescreening', description: 'Eligibility Analysis' },
     { id: 9, title: 'Documents', description: 'Upload & Verification' },
-    { id: 10, title: 'Lenders', description: 'Select Lenders' },
-    { id: 11, title: 'Review', description: 'Final Review' }
+    { id: 10, title: 'Insurance', description: 'Loan Protection' },
+    { id: 11, title: 'Payment', description: 'Pay & Process' },
+    { id: 12, title: 'Lenders', description: 'Select Lenders' },
+    { id: 13, title: 'Review', description: 'Final Review' }
   ]
 
   // Use internal state if no external control provided
@@ -253,6 +257,24 @@ export function ApplicationWizard({
         )
       case 10:
         return (
+          <InsuranceStep
+            applicationData={applicationData}
+            onDataUpdate={handleDataUpdate}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        )
+      case 11:
+        return (
+          <PaymentStep
+            applicationData={applicationData}
+            onDataUpdate={handleDataUpdate}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        )
+      case 12:
+        return (
           <LenderSelection
             selectedLenders={applicationData.selectedLenders || []}
             onLenderSelectionChange={(lenderIds) => handleDataUpdate(lenderIds, 'selectedLenders')}
@@ -272,7 +294,7 @@ export function ApplicationWizard({
             }}
           />
         )
-      case 11:
+      case 13:
         return (
           <ReviewStep
             applicationData={applicationData}
