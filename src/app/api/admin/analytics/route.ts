@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { errorHandler, AppError } from '@/middleware/errorHandler';
 
 const prisma = new PrismaClient();
@@ -19,7 +19,7 @@ type Application = {
   createdAt: Date | string;
 };
 
-type LenderStat = { lenderId: string; _count: { id: number }; _avg: { responseTime: number } };
+type LenderStat = { lenderId: string; _count: { id: number }; _avg: { responseTime: number | null } };
 
 async function getAnalytics(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -90,13 +90,13 @@ async function getAnalytics(req: NextRequest) {
   const lenders = await prisma.lender.findMany({
     where: {
       id: {
-        in: lenderStats.map((stat) => stat.lenderId),
+        in: lenderStats.map((stat: LenderStat) => stat.lenderId),
       },
     },
   });
 
   const lenderPerformance = lenders.map((lender: { id: string; name: string }) => {
-    const stats = lenderStats.find((stat) => stat.lenderId === lender.id);
+    const stats = lenderStats.find((stat: LenderStat) => stat.lenderId === lender.id);
     const approvedCount = applications.filter((app: Application) =>
       app.lenderApplications.some((la: LenderApplication) => 
         la.lenderId === lender.id && la.status === 'APPROVED'

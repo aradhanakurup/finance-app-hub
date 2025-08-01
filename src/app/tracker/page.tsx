@@ -188,19 +188,19 @@ export default function TrackerPage() {
           </div>
         </div>
       </div>
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 border">
-            <div className="text-center">
+          <div className="text-center">
               <p className="text-sm font-medium text-gray-600">Total</p>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-            </div>
-          </div>
+                </div>
+              </div>
           <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Approved</p>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Approved</p>
               <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
             </div>
           </div>
@@ -208,11 +208,11 @@ export default function TrackerPage() {
             <div className="text-center">
               <p className="text-sm font-medium text-gray-600">Processing</p>
               <p className="text-2xl font-bold text-blue-600">{stats.processing}</p>
-            </div>
-          </div>
+                </div>
+              </div>
           <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Pending</p>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Pending</p>
               <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function TrackerPage() {
               <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
             </div>
           </div>
-        </div>
+                </div>
 
         {/* Search and Filters */}
         <div className="bg-white rounded-lg p-4 border mb-6">
@@ -371,7 +371,7 @@ export default function TrackerPage() {
               ))}
             </div>
           )}
-        </div>
+      </div>
       </main>
     </div>
   );
